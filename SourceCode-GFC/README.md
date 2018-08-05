@@ -3,19 +3,19 @@ Graph Fact Checking Rules
 
 ## GFC documents
 
-Paper: 2018-DASFAA-GFC-paper.pdf
+**Paper: docs/2018-DASFAA-GFC-paper.pdf**
 
-Discovering Graph Patterns for Fact Checking in Knowledge Graphs
+**Discovering Graph Patterns for Fact Checking in Knowledge Graphs**
 
 International Conference on Database Systems for Advanced Applications (DASFAA), 2018
 
 Peng Lin, Qi Song, Jialiang Shen, and Yinghui Wu
 
-Slides: 2018-DASFAA-GFC-slides.pptx
+**Slides: docs/2018-DASFAA-GFC-slides.pptx**
 
-## Preliminary work.
+#### Preliminary work.
 
-Preprint-Fact Checking Benchmarks.pdf
+2018-Preprint-Fact Checking Benchmarks.pdf
 
 ## Reference
 
