@@ -27,7 +27,7 @@ public class TestOGFC {
                 + "\nminSupp = " + minSupp
                 + "\nminConf = " + minConf
                 + "\nmaxSize = " + maxSize
-                + "\ntok-K = " + topK);
+                + "\ntop-K = " + topK);
 
         System.out.println("Loading the data graph....");
         Graph<String, String> graph = IO.loadStringGraph(inputDir);
