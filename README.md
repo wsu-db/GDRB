@@ -31,14 +31,28 @@ Source Code: SourceCode-GFC/
 ### GFC (Graph Fact Checking Rules)
 ```java
 $ mvn package
-$ java -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar edu.wsu.eecs.gfc.exps.TestGFC ./sample_data/ ./output 0.01 0.0001 4 50
+$ java -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar \
+        edu.wsu.eecs.gfc.exps.TestGFC \
+		./sample_data/ \
+		./output \
+		0.01 \
+		0.0001 \
+		4 \
+		50
 ```
 
 ### OGFC (Graph Fact Checking Rules with Ontology Closeness Enabled)
 
 ```java
 $ mvn package
-$ java -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar edu.wsu.eecs.gfc.exps.TestOGFC ./sample_data/ ./output 0.01 0.0001 4 50
+$ java -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar \
+        edu.wsu.eecs.gfc.exps.TestOGFC \
+		./sample_data/ \
+		./output \
+		0.01 \
+		0.0001 \
+		4 \
+		50
 ```
 
 ### Contact
