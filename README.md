@@ -40,3 +40,8 @@ $ java -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar edu.wsu.
 $ mvn package
 $ java -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar edu.wsu.eecs.gfc.exps.TestOGFC ./sample_data/ ./output 0.01 0.0001 4 50
 ```
+
+### Contact
+
+peng.lin@wsu.edu
+http://eecs.wsu.edu/~plin1
