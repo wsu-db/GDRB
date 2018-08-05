@@ -28,6 +28,10 @@ Source Code: SourceCode-GFC/
 
 ## Quick build and test
 
+### Requirements
+
+JDK 1.8+ and Maven 3.0+
+
 ### GFC (Graph Fact Checking Rules)
 ```java
 $ mvn package
