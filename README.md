@@ -44,4 +44,5 @@ $ java -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar edu.wsu.
 ### Contact
 
 peng.lin@wsu.edu
+
 http://eecs.wsu.edu/~plin1
