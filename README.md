@@ -3,7 +3,7 @@ Graph Data Regularities Benchmark (GDRB)
 
 ## Preliminary work.
 
-2018-Preprint-Fact Checking Benchmarks.pdf
+Fact Checking Benchmarks (unpublished draft).pdf
 
 ## GFC documents
 
