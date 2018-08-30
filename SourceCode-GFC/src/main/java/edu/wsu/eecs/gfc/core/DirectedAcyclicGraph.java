@@ -2,6 +2,11 @@ package edu.wsu.eecs.gfc.core;
 
 import java.util.*;
 
+/**
+ * DAG and topological sort for graphs.
+ * <p>
+ * Peng Lin penglin03@gmail.com
+ */
 public class DirectedAcyclicGraph<VT, ET> {
 
     private Graph<VT, ET> g;

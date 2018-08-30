@@ -3,11 +3,11 @@ package edu.wsu.eecs.gfc.core;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Relation: a relation is defined as a triple of labels: (srcLabel, dstLabel, edgeLabel).
- * One may think it is a relation in R in {srcLabel} x {dstLabel}.
- * We adopt a post order because the edgeLabel is optional.
+ * Relation: a relation in a graph is a triple of labels: (srcLabel, dstLabel, edgeLabel)
  * Given two nodes v_x and v_y with labels x and y, respectively, a relation r(x, y) identifies a
  * relationship between the two nodes.
+ *
+ * @author Peng Lin penglin03@gmail.com
  */
 public class Relation<VT, ET> {
 

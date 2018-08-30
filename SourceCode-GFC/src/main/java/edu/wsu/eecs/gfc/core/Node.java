@@ -4,6 +4,12 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A descriptor for graph nodes.
+ * <p>
+ * A node has a unique ID, which can be any name or number for the node.
+ * A node carries a label, which has the type VT, specified by the user.
+ * The ID cannot be changed and the label can be reassigned.
+ *
+ * @author Peng Lin penglin03@gmail.com
  */
 public class Node<VT> {
 

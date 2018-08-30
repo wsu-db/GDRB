@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+/**
+ * Doing fact checking here with GFCs
+ * <p>
+ * @author Peng Lin penglin03@gmail.com
+ */
 public class FactChecker {
 
     public static <VT, ET> String predictByHits(List<OGFCRule<VT, ET>> patternList, Map<Boolean, List<Edge<VT, ET>>> dataTest) {

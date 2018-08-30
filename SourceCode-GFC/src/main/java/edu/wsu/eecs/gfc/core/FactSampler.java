@@ -5,6 +5,8 @@ import java.util.*;
 /**
  * Sample a set of positive and negative facts from the graph.
  * Note: the positive testing data (edges) will be removed from the graph.
+ * <p>
+ * @author Peng Lin penglin03@gmail.com
  */
 public class FactSampler<VT, ET> {
     private GraphDatabase<VT, ET> bigGraph;

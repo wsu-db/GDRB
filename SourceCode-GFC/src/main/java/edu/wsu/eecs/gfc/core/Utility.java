@@ -5,6 +5,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Utility functions
+ * @author Peng Lin penglin03@gmail.com
+ */
 public class Utility {
 
     public static <K, V> Map<V, K> getInverseMap(Map<K, V> map) {

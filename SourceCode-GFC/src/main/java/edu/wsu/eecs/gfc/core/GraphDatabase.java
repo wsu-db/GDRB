@@ -6,8 +6,12 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * A very simple in-memory graph database,
- * which provides primitive variant index for nodes, edges, labels, and relations.
+ * A very simple in-memory graph database.
+ * <p>
+ * Well, it is not a real database, but grasps the concepts of database.
+ * It has frequent used indices that make sure fast access of the graph.
+ *
+ * @author Peng Lin penglin03@gmail.com
  */
 public class GraphDatabase<VT, ET> {
 

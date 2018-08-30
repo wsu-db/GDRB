@@ -4,6 +4,11 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * A descriptor for graph edges.
+ * <p>
+ * An edge has two end nodes (srcNode and dstNode) and an edge label in type of ET.
+ * The srcNode and dstNode cannot be changed and the edge label can be reassigned.
+ *
+ * @author Peng Lin penglin03@gmail.com
  */
 public class Edge<VT, ET> {
 

@@ -3,6 +3,11 @@ package edu.wsu.eecs.gfc.core;
 import java.io.*;
 import java.util.*;
 
+/**
+ * Loaders, savers, and other stuffs with IO.
+ * <p>
+ * @author Peng Lin penglin03@gmail.com
+ */
 public class IO {
 
     public static Map<Integer, Relation<Integer, Integer>> readRelationFile(String relationFile, Map<String, Integer> lutLabelStr2Int) {

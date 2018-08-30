@@ -7,6 +7,10 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The caller to test GFC mining.
+ * @author Peng Lin penglin03@gmail.com
+ */
 public class TestOGFC {
 
     private static final int GLOBAL_HOPS = 2;

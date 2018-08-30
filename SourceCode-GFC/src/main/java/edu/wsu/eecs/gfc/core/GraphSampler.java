@@ -6,6 +6,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 
+/**
+ * Sampling graphs into different sizes for different impact factors.
+ * <p>
+ * @author Peng Lin penglin03@gmail.com
+ */
 public class GraphSampler {
 
     public static final String SEP = File.separator;

@@ -7,9 +7,15 @@ import java.util.*;
 /**
  * Graph - represent simple directed labeled graphs.
  * - Every node can have at most one self loop.
- * - Every two nodes u and v can have at most one edge (u, v), and at most one edge (v, u).
+ * - Every pair of nodes (u, v) can have at most one edge from u to v, and at most one edge from v to u.
  * - Otherwise, there are no parallel edges.
+ * - For undirected graphs, the graph can be constructed by randomly assigning the direction of edges.
+ * To enumerate edges from a node, every time enumerate edges both from and to the node.
+ * <p>
+ * Note:
  * - Node IDs should be immutable, since they are used as keys of underlying hash maps of the graph.
+ *
+ * @author Peng lin penglin03@gmail.com
  */
 public class Graph<VT, ET> {
 

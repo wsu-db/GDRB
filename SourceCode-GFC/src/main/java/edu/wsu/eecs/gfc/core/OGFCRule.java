@@ -13,6 +13,8 @@ import java.util.*;
  * a relation r, and a set of edges that are initially covered by the pattern P.
  * For more details, see our paper:
  * Discovering Graph Patterns for Fact Checking in Knowledge Graphs (DASFAA 2018)
+ * <p>
+ * @author Peng Lin penglin03@gmail.com
  */
 public class OGFCRule<VT, ET> {
 

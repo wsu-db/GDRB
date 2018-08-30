@@ -3,6 +3,11 @@ package edu.wsu.eecs.gfc.core;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * The major GFC mining algorithms.
+ * <p>
+ * @author Peng Lin penglin03@gmail.com
+ */
 public class RuleMiner<VT, ET> {
 
     private GraphDatabase<VT, ET> G;
