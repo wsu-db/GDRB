@@ -2,14 +2,12 @@ package edu.wsu.eecs.gfc.core;
 
 import weka.classifiers.Classifier;
 import weka.classifiers.Evaluation;
-import weka.classifiers.evaluation.ThresholdCurve;
 import weka.classifiers.functions.Logistic;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
-import weka.core.converters.CSVSaver;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import com.opencsv.CSVWriter;
+import java.io.FileWriter;
 
 /**
  * Doing fact checking here with GFCs
@@ -71,10 +71,10 @@ public class FactChecker {
         return outStr;
     }
 
-    public static <VT, ET> String predictByLogisticRegression(List<OGFCRule<VT, ET>> patternList, Relation<VT, ET> r,
-                                                              Map<Boolean, List<Edge<VT, ET>>> dataTrain,
-                                                              Map<Boolean, List<Edge<VT, ET>>> dataTest,
-                                                              String outputPath, String tag) throws Exception {
+    public static <VT, ET> String Train_LRModel(List<OGFCRule<VT, ET>> patternList, Relation<VT, ET> r,
+                                                              Map<Boolean, List<Edge<VT, ET>>> dataTrain, String outputPath) 
+                                                              throws Exception 
+    {
         int dim = patternList.size();
         ArrayList<Attribute> fvec = new ArrayList<>(dim + 1);
         for (int i = 0; i < dim; i++) {
@@ -88,9 +88,7 @@ public class FactChecker {
 
         String rName = r.srcLabel() + "_" + r.edgeLabel() + "_" + r.dstLabel();
         Instances trainSet = new Instances(rName, fvec, 10);
-        Instances testSet = new Instances(rName, fvec, 10);
         trainSet.setClassIndex(dim);
-        testSet.setClassIndex(dim);
 
         for (Edge<VT, ET> posTrain : dataTrain.get(true)) {
             Instance iExample = new DenseInstance(dim + 1);
@@ -120,7 +118,61 @@ public class FactChecker {
             iExample.setValue(fvec.get(dim), "FALSE");
             trainSet.add(iExample);
         }
+        if (trainSet.size() < 1) {
+            return "WARNING: Skip training. Not enough training examples.";
+        }
+
+        Classifier model = new Logistic();
+        model.buildClassifier(trainSet);
+        weka.core.SerializationHelper.write("./Trained_Models/LR.model", model);
+
+        ArffSaver arffSaver;
+        arffSaver = new ArffSaver();
+        arffSaver.setInstances(trainSet);
+        try {
+            arffSaver.setFile(new File(outputPath, rName + "_Train.arff"));
+            arffSaver.writeBatch();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String Outstr = "\nModel has been trained with Logistic Regression";
+        return Outstr;
+
+    }
+
+    /**
+     * @param <VT>
+     * @param <ET>
+     * @param patternList
+     * @param r
+     * @param dataTest
+     * @param outputPath
+     * @return
+     * @throws Exception
+     */
+    public static <VT, ET> String Test_LRModel(List<OGFCRule<VT, ET>> patternList, Relation<VT, ET> r,
+                                                              Map<Boolean, List<Edge<VT, ET>>> dataTest, String outputPath) 
+                                                              throws Exception 
+    {
+        int dim = patternList.size();
+        ArrayList<Attribute> fvec = new ArrayList<>(dim + 1);
+        for (int i = 0; i < dim; i++) {
+            fvec.add(new Attribute("P" + i));
+        }
+        ArrayList<String> classVals = new ArrayList<>(2);
+        classVals.add("TRUE");
+        classVals.add("FALSE");
+        Attribute attrClass = new Attribute("class", classVals);
+        fvec.add(attrClass);
+
+        String rName = r.srcLabel() + "_" + r.edgeLabel() + "_" + r.dstLabel();
+        Instances testSet = new Instances(rName, fvec, 10);
+        testSet.setClassIndex(dim);
+        List<String> facts = new ArrayList<>();
         for (Edge<VT, ET> posTest : dataTest.get(true)) {
+            // System.out.println(posTest);
+            facts.add(posTest.toString());
             Instance iExample = new DenseInstance(dim + 1);
             for (int i = 0; i < patternList.size(); i++) {
                 OGFCRule<VT, ET> p = patternList.get(i);
@@ -135,6 +187,8 @@ public class FactChecker {
             testSet.add(iExample);
         }
         for (Edge<VT, ET> negTest : dataTest.get(false)) {
+            // System.out.println(negTest);
+            facts.add(negTest.toString());
             Instance iExample = new DenseInstance(dim + 1);
             for (int i = 0; i < patternList.size(); i++) {
                 OGFCRule<VT, ET> p = patternList.get(i);
@@ -148,80 +202,72 @@ public class FactChecker {
             iExample.setValue(fvec.get(dim), "FALSE");
             testSet.add(iExample);
         }
-
-        if (trainSet.size() < 1) {
-            return "WARNING: Skip training. Not enough training examples.";
-        }
+        
         if (testSet.size() < 1) {
             return "WARNING: Skip training. Not enough testing examples.";
         }
 
-        Classifier model = new Logistic();
-        model.buildClassifier(trainSet);
-        Evaluation eval = new Evaluation(trainSet);
-        eval.evaluateModel(model, testSet);
+        // Importing trained model
+        Classifier model = null;
+        try {
+            model = (Classifier) weka.core.SerializationHelper
+                    .read("./Trained_Models/LR.model");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (model == null)
+            return null;   
 
+        List<String> result = new ArrayList<>();
+        for (int i = 0; i < testSet.numInstances(); i++) {
+            double pred = model.classifyInstance(testSet.instance(i));
+            // System.out.print("ID: " + Test.instance(i).value(0));
+            // System.out.print(", actual: " + Test.classAttribute().value((int) Test.instance(i).classValue()));
+            // System.out.println(", predicted: " + Test.classAttribute().value((int) pred));
+            result.add(testSet.classAttribute().value((int) pred));
+        }
 
+        File file = new File("./"+outputPath+"/Predictions.csv");
+        try {
+            FileWriter outputfile = new FileWriter(file);
+            CSVWriter writer = new CSVWriter(outputfile,',',CSVWriter.NO_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);
+
+            String[] header = { "Assertion", "Prediction"};
+            writer.writeNext(header);
+
+            for(int i=0; i<facts.size(); i++){
+            String[] a = { facts.get(i), result.get(i)};
+            writer.writeNext(a);
+            }    
+            writer.close();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Evaluation eval = new Evaluation(testSet);
+        eval.crossValidateModel(model, testSet, 10, new Random(1));
+
+        // Evaluation eval = new Evaluation(trainSet);
+        // eval.evaluateModel(model, testSet);
+        // System.out.println("\nAccuracy: \n"+eval.pctCorrect()+"\n");
+        
         String outStr = (eval.pctCorrect() / 100) + "\t" +
                 (eval.precision(0)) + "\t" +
                 (eval.recall(0)) + "\t" +
                 (eval.fMeasure(0));
-//        System.out.println((eval.pctCorrect() / 100) + "\t" +
-//                (eval.precision(0)) + "\t" +
-//                (eval.recall(0)) + "\t" +
-//                (eval.fMeasure(0))
-//        );
 
         ArffSaver arffSaver;
         arffSaver = new ArffSaver();
-        arffSaver.setInstances(trainSet);
-        try {
-            arffSaver.setFile(new File(outputPath, rName + "_" + tag + "_Train.arff"));
-            arffSaver.writeBatch();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        arffSaver = new ArffSaver();
         arffSaver.setInstances(testSet);
         try {
-            arffSaver.setFile(new File(outputPath, rName + "_" + tag + "_Test.arff"));
+            arffSaver.setFile(new File(outputPath, rName + "_" + "_Test.arff"));
             arffSaver.writeBatch();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-        ThresholdCurve tc = new ThresholdCurve();
-        int classIndex = 0;
-        Instances result = tc.getCurve(eval.predictions(), classIndex);
-
-        CSVSaver csvSaver = new CSVSaver();
-        csvSaver.setInstances(result);
-        try {
-            csvSaver.setFile(new File(outputPath, rName + "_" + tag + "_RocTT.csv"));
-            csvSaver.writeBatch();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        eval.crossValidateModel(model, trainSet, 10, new Random(1));
-
-
-        tc = new ThresholdCurve();
-        result = tc.getCurve(eval.predictions(), 0);
-
-        csvSaver = new CSVSaver();
-        csvSaver.setInstances(result);
-        try {
-            csvSaver.setFile(new File(outputPath, rName + "_" + tag + "_RocCV.csv"));
-            csvSaver.writeBatch();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-//        System.out.println(eval.toClassDetailsString());
-//        System.out.println(eval.toMatrixString());
+        // String outStr = "\nModel has been Tested";
         return outStr;
     }
 }
