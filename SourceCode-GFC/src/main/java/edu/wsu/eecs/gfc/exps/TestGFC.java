@@ -80,10 +80,16 @@ public class TestGFC {
             System.out.println("Discovered number of patterns: |P| = " + patterns.size() + ", Time = " + w.elapsed(TimeUnit.SECONDS));
             System.out.println("FactChecker: OFact_R: "
                     + FactChecker.predictByHits(patterns, sampler.getDataTest()));
-            System.out.println("FactChecker: OFact    "
-                    + FactChecker.predictByLogisticRegression(patterns, r, sampler.getDataTrain(), sampler.getDataTest(), outputDir, "lr"));
+            
+            new File("Trained_Models").mkdirs();
+            
+            System.out.println("\nTraining: "
+                    + FactChecker.Train_LRModel(patterns, r, sampler.getDataTrain(), outputDir));
 
-            System.out.println("Restore the sampled facts....");
+            System.out.println("\nModel Evaluation: \n"+"\nAccuracy\tPrecision\tRecall\tFMeasure\n"
+                    + FactChecker.Test_LRModel(patterns, r, sampler.getDataTest(), outputDir));
+
+            System.out.println("\nRestore the sampled facts....");
             sampler.restore();
         }
         System.out.println("-------------------DONE-----------------");
