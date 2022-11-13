@@ -109,35 +109,35 @@ public class TestOGFC {
 
             System.out.println("Relation List: " + Arrays.toString(inputRelations.toArray()));
 
-            FactSampler<String, String> sampler = new FactSampler<>(bigGraph, new ArrayList<>(inputRelations));
+            // FactSampler<String, String> sampler = new FactSampler<>(bigGraph, new ArrayList<>(inputRelations));
 
-            if (sampler.getDataTest().get(true).size() == 0) {
-                System.out.println("Not enough true testing data. Skip....");
-                continue;
-            }
+            // if (sampler.getDataTest().get(true).size() == 0) {
+            //     System.out.println("Not enough true testing data. Skip....");
+            //     continue;
+            // }
 
-            if (sampler.getDataTest().get(false).size() == 0) {
-                System.out.println("Not enough false testing data. Skip....");
-                continue;
-            }
+            // if (sampler.getDataTest().get(false).size() == 0) {
+            //     System.out.println("Not enough false testing data. Skip....");
+            //     continue;
+            // }
 
-            for (int i = 0; i <= GLOBAL_HOPS; i++) {
-                bigGraph.buildSimLabelsMap(i);
+            // for (int i = 0; i <= GLOBAL_HOPS; i++) {
+            //     bigGraph.buildSimLabelsMap(i);
 
-                Stopwatch w = Stopwatch.createStarted();
-                List<OGFCRule<String, String>> patterns = miner.OGFC_stream(r, sampler.getDataTrain().get(true), sampler.getDataTrain().get(false));
-                w.stop();
+            //     Stopwatch w = Stopwatch.createStarted();
+            //     List<OGFCRule<String, String>> patterns = miner.OGFC_stream(r, sampler.getDataTrain().get(true), sampler.getDataTrain().get(false));
+            //     w.stop();
 
-                System.out.println("Hop = " + i + ", r = " + r);
-                System.out.println("Discovered number of patterns: |P| = " + patterns.size() + ", Time = " + w.elapsed(TimeUnit.SECONDS));
-                System.out.println("FactChecker: OFact_R: "
-                        + FactChecker.predictByHits(patterns, sampler.getDataTest()));
-                System.out.println("FactChecker: OFact    "
-                        + FactChecker.predictByLogisticRegression(patterns, r, sampler.getDataTrain(), sampler.getDataTest(), outputDir, "lr"));
-            }
+            //     System.out.println("Hop = " + i + ", r = " + r);
+            //     System.out.println("Discovered number of patterns: |P| = " + patterns.size() + ", Time = " + w.elapsed(TimeUnit.SECONDS));
+            //     System.out.println("FactChecker: OFact_R: "
+            //             + FactChecker.predictByHits(patterns, sampler.getDataTest()));
+            //     System.out.println("FactChecker: OFact    "
+            //             + FactChecker.predictByLogisticRegression(patterns, r, sampler.getDataTrain(), sampler.getDataTest(), outputDir, "lr"));
+            // }
 
-            System.out.println("Restore the sampled facts....");
-            sampler.restore();
+            // System.out.println("Restore the sampled facts....");
+            // sampler.restore();
         }
         System.out.println("-------------------DONE-----------------");
     }

@@ -11,4 +11,4 @@ WORKDIR /GDRB/SourceCode-GFC
 RUN mvn package
 
 # Execute GFC
-CMD java -Xmx2048m -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar edu.wsu.eecs.gfc.exps.TestGFC ./sample_data/ ./output 0.01 0.0001 4 50
+CMD java -Xmx2048m -cp ./target/factchecking-1.0-SNAPSHOT-jar-with-dependencies.jar edu.wsu.eecs.gfc.exps.GFC ./sample_data/ ./output 0.01 0.0001 4 50

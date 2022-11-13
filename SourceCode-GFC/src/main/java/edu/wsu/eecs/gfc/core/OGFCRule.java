@@ -213,7 +213,7 @@ public class OGFCRule<VT, ET> {
         }
 
         OGFCRule<VT, ET> phi2 = new OGFCRule<>(Q, phi.G, matchSet, phi.exy);
-        phi2.removeUnmatchedPairs();
+        // phi2.removeUnmatchedPairs();
         return phi2;
     }
 

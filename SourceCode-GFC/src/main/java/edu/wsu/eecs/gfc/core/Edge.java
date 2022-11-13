@@ -68,7 +68,7 @@ public class Edge<VT, ET> {
 
     @Override
     public String toString() {
-        return srcNode + "\t" + label + "\t" + dstNode;
+        return srcNode + "\t" + dstNode + "\t" + label;
     }
 
     @Override
