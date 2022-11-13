@@ -9,19 +9,22 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.ArffSaver;
 
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.io.*;
+import java.util.*;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
 import com.opencsv.CSVWriter;
-import java.io.FileWriter;
 
 /**
  * Doing fact checking here with GFCs
  * <p>
  * @author Peng Lin penglin03@gmail.com
+ * @param <VT>
  */
 public class FactChecker {
 
@@ -90,13 +93,20 @@ public class FactChecker {
         Instances trainSet = new Instances(rName, fvec, 10);
         trainSet.setClassIndex(dim);
 
+        Map<String, List<List<Set<Node<VT>>>>> pMatchSet = new HashMap<String, List<List<Set<Node<VT>>>>>();
+        List<Set<Node<VT>>> xSet = new ArrayList<Set<Node<VT>>>();
+        List<Set<Node<VT>>> ySet = new ArrayList<Set<Node<VT>>>();
+        List<List<Set<Node<VT>>>> pNodes = new ArrayList<List<Set<Node<VT>>>>();
+
         for (Edge<VT, ET> posTrain : dataTrain.get(true)) {
             Instance iExample = new DenseInstance(dim + 1);
             for (int i = 0; i < patternList.size(); i++) {
                 OGFCRule<VT, ET> p = patternList.get(i);
+                xSet.add(p.matchSet().get(p.x()));
+                ySet.add(p.matchSet().get(p.y()));
                 if (p.matchSet().get(p.x()).contains(posTrain.srcNode())
                         && p.matchSet().get(p.y()).contains(posTrain.dstNode())) {
-                    iExample.setValue(fvec.get(i), 1);
+                    iExample.setValue(fvec.get(i), 1);          
                 } else {
                     iExample.setValue(fvec.get(i), 0);
                 }
@@ -104,6 +114,11 @@ public class FactChecker {
             iExample.setValue(fvec.get(dim), "TRUE");
             trainSet.add(iExample);
         }
+        pNodes.add(xSet);
+        pNodes.add(ySet);
+        pMatchSet.put(rName,pNodes);
+        Json_Writer(pMatchSet,rName);
+
         for (Edge<VT, ET> negTrain : dataTrain.get(false)) {
             Instance iExample = new DenseInstance(dim + 1);
             for (int i = 0; i < patternList.size(); i++) {
@@ -124,7 +139,7 @@ public class FactChecker {
 
         Classifier model = new Logistic();
         model.buildClassifier(trainSet);
-        weka.core.SerializationHelper.write("./Trained_Models/LR.model", model);
+        weka.core.SerializationHelper.write("./Trained_Models/"+rName+"_LR.model", model);
 
         ArffSaver arffSaver;
         arffSaver = new ArffSaver();
@@ -136,11 +151,17 @@ public class FactChecker {
             e.printStackTrace();
         }
 
-        String Outstr = "\nModel has been trained with Logistic Regression";
+        String Outstr = "\nModels have been trained with Logistic Regression";
         return Outstr;
-
     }
 
+    public static <VT> void Json_Writer(Map<String, List<List<Set<Node<VT>>>>> pMatchSet, String rName) throws IOException {
+        Gson gson = new Gson();
+        Writer writer = Files.newBufferedWriter(Paths.get("./Patterns/"+rName+".json"));
+        gson.toJson(pMatchSet, writer);
+        writer.close();  
+    } 
+    
     /**
      * @param <VT>
      * @param <ET>
@@ -151,11 +172,11 @@ public class FactChecker {
      * @return
      * @throws Exception
      */
-    public static <VT, ET> String Test_LRModel(List<OGFCRule<VT, ET>> patternList, Relation<VT, ET> r,
+    public static <VT, ET> String Test_LRModel(int topK, Relation<VT, ET> r,
                                                               Map<Boolean, List<Edge<VT, ET>>> dataTest, String outputPath) 
                                                               throws Exception 
     {
-        int dim = patternList.size();
+        int dim = topK;
         ArrayList<Attribute> fvec = new ArrayList<>(dim + 1);
         for (int i = 0; i < dim; i++) {
             fvec.add(new Attribute("P" + i));
@@ -169,15 +190,23 @@ public class FactChecker {
         String rName = r.srcLabel() + "_" + r.edgeLabel() + "_" + r.dstLabel();
         Instances testSet = new Instances(rName, fvec, 10);
         testSet.setClassIndex(dim);
+        List<Set<Node<VT>>> xSet = new ArrayList<Set<Node<VT>>>();
+        List<Set<Node<VT>>> ySet = new ArrayList<Set<Node<VT>>>();
+        List<List<Set<Node<VT>>>> pNodes = new ArrayList<List<Set<Node<VT>>>>();
+        Map<String, List<List<Set<Node<VT>>>>> pMatchSet = new HashMap<String, List<List<Set<Node<VT>>>>>();
+        
+        pMatchSet = Json_Reader(rName);
+        pNodes = pMatchSet.get(rName);
+        xSet = pNodes.get(0);
+        ySet = pNodes.get(1);
+
         List<String> facts = new ArrayList<>();
         for (Edge<VT, ET> posTest : dataTest.get(true)) {
-            // System.out.println(posTest);
             facts.add(posTest.toString());
             Instance iExample = new DenseInstance(dim + 1);
-            for (int i = 0; i < patternList.size(); i++) {
-                OGFCRule<VT, ET> p = patternList.get(i);
-                if (p.matchSet().get(p.x()).contains(posTest.srcNode())
-                        && p.matchSet().get(p.y()).contains(posTest.dstNode())) {
+            for (int i = 0; i < topK; i++) {
+                if (xSet.get(i).contains(posTest.srcNode())
+                        && ySet.get(i).contains(posTest.dstNode())) {
                     iExample.setValue(fvec.get(i), 1);
                 } else {
                     iExample.setValue(fvec.get(i), 0);
@@ -187,13 +216,11 @@ public class FactChecker {
             testSet.add(iExample);
         }
         for (Edge<VT, ET> negTest : dataTest.get(false)) {
-            // System.out.println(negTest);
             facts.add(negTest.toString());
             Instance iExample = new DenseInstance(dim + 1);
-            for (int i = 0; i < patternList.size(); i++) {
-                OGFCRule<VT, ET> p = patternList.get(i);
-                if (p.matchSet().get(p.x()).contains(negTest.srcNode())
-                        && p.matchSet().get(p.y()).contains(negTest.dstNode())) {
+            for (int i = 0; i < topK; i++) {
+                if (xSet.get(i).contains(negTest.srcNode())
+                        && xSet.get(i).contains(negTest.dstNode())) {
                     iExample.setValue(fvec.get(i), 1);
                 } else {
                     iExample.setValue(fvec.get(i), 0);
@@ -211,7 +238,7 @@ public class FactChecker {
         Classifier model = null;
         try {
             model = (Classifier) weka.core.SerializationHelper
-                    .read("./Trained_Models/LR.model");
+                    .read("./Trained_Models/"+rName+"_LR.model");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -229,7 +256,7 @@ public class FactChecker {
 
         File file = new File("./"+outputPath+"/Predictions.csv");
         try {
-            FileWriter outputfile = new FileWriter(file);
+            FileWriter outputfile = new FileWriter(file,true);
             CSVWriter writer = new CSVWriter(outputfile,',',CSVWriter.NO_QUOTE_CHARACTER, CSVWriter.DEFAULT_ESCAPE_CHARACTER, CSVWriter.DEFAULT_LINE_END);
 
             String[] header = { "Assertion", "Prediction"};
@@ -269,5 +296,17 @@ public class FactChecker {
 
         // String outStr = "\nModel has been Tested";
         return outStr;
+    }
+
+    public static <VT> Map<String, List<List<Set<Node<VT>>>>> Json_Reader(String rName) throws IOException{
+        Gson gson = new Gson();
+        Reader reader = Files.newBufferedReader(Paths.get("./Patterns/"+rName+".json"));
+
+        java.lang.reflect.Type mapType = new TypeToken<Map<String, List<List<Set<Node<VT>>>>>>(){}.getType();
+        Map<String, List<List<Set<Node<VT>>>>> pMatchSet = gson.fromJson(reader, mapType);
+ 
+        reader.close();
+
+        return pMatchSet;
     }
 }
