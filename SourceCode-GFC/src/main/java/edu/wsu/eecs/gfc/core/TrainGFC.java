@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 public class TrainGFC {
     private static final int GLOBAL_HOPS = 2;
 
+    public static List<String> trainingAssertions = new ArrayList<>();
+
     public static void train(String inputDir,String outputDir,double minSupp,double minConf,int maxSize,int topK) throws Exception {
 
         new File(outputDir).mkdirs();
@@ -70,6 +72,13 @@ public class TrainGFC {
 
         }
         System.out.println("-------------------DONE-----------------");
+    }
+
+    public static List<String> addTrainingData(String sub, String pred, String obj, String truthVal){
+
+        String assertion = sub +"\t" + pred +"\t" + obj +"\t" + truthVal ;
+        trainingAssertions.add(assertion);
+        return trainingAssertions;
     }
     
 }

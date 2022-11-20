@@ -4,6 +4,8 @@ import java.util.*;
 
 public class TestGFC {
 
+    public static List<String> testingAssertions = new ArrayList<>();
+
     public static void test(String inputDir,String outputPath,int topK) throws Exception {
 
         List<Relation<String, String>> relationList = IO.loadRelations(inputDir);
@@ -19,4 +21,11 @@ public class TestGFC {
             + FactChecker.Test_LRModel(topK, r, sampler.getDataTest(), outputPath));
         }
    }
+
+   public static List<String> addTestingData(String sub, String pred, String obj){
+
+    String assertion = sub +"\t" + pred +"\t" + obj +"\t";
+    testingAssertions.add(assertion);
+    return testingAssertions;
+}
 }
